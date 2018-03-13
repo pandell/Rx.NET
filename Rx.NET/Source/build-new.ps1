@@ -35,9 +35,15 @@ $msbuildExe = Join-Path $msbuild.MSBuildToolsPath "msbuild.exe"
 
 
 #update version
-.\packages\gitversion.commandline\tools\gitversion.exe /l console /output buildserver /updateassemblyinfo
+# .\packages\gitversion.commandline\tools\gitversion.exe /l console /output buildserver /updateassemblyinfo
 
-$versionObj = .\packages\gitversion.commandline\tools\gitversion.exe | ConvertFrom-Json 
+# $versionObj = .\packages\gitversion.commandline\tools\gitversion.exe | ConvertFrom-Json
+$versionObj = @{
+    MajorMinorPatch = "3.1.2"
+    PreReleaseLabel = "alpha"
+    CommitsSinceVersionSourcePadded = "00000"
+    PreReleaseNumber = "1"
+}
 
 $version = $versionObj.MajorMinorPatch
 $tag = $versionObj.PreReleaseLabel
@@ -60,6 +66,10 @@ if($tag -ne ""){
 Write-Host "Version: $version"
 
 Write-Host "Restoring packages" -Foreground Green
+# $env:MSBuildExtensionsPath32 = "c:\Program Files (x86)\MSBuild"
+# $env:VisualStudioVersion = "14.0"
+# $env:CodeAnalysisStaticAnalysisDirectory = (Get-Item Registry::HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\EDev).GetValue("StanDir")
+# $env:CodeAnalysisPath = (Get-Item Registry::HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\VisualStudio\14.0\Setup\EDev).GetValue("FxCopDir")
 dotnet restore $scriptPath | out-null
 
 #need to ensure core is built first due to bad dependency order determination by dotnet build
